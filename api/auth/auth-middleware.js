@@ -1,6 +1,6 @@
 // const { JWT_SECRET } = require("../secrets"); // use this secret!
 // const jwt = require('jsonwebtoken');
- const User = require('../users/users-model');
+const User = require('../users/users-model');
 
 const validateEmpty = (req, res, next) => {
     const { username, password } = req.body;
@@ -14,14 +14,14 @@ const validateEmpty = (req, res, next) => {
     }
 };
 
-const checkUsernameExists = async (req, res, next) => {
+const validateLogin = async (req, res, next) => {
     const { username } = req.body;
     const [user] = await User.findBy({ username });
     try {
         if (!user) {
             return next({
                 status: 401,
-                message: 'username taken'
+                message: 'invalid credentials'
             });
         } else {
             req.user = user;
@@ -31,7 +31,26 @@ const checkUsernameExists = async (req, res, next) => {
         next(err)
     }
 };
-    module.exports = {
-        validateEmpty,
-        checkUsernameExists,
-    };
+
+const validateRegister = async (req, res, next) => {
+    const { username } = req.body;
+    const [user] = await User.findBy({ username });
+    try {
+        if (!user) {
+            req.user = user;
+            next();
+        } else {
+            return next({
+                status: 401,
+                message: 'username taken'
+            });
+        }
+    } catch (err) {
+        next(err)
+    }
+};
+module.exports = {
+    validateEmpty,
+    validateLogin,
+    validateRegister,
+};
