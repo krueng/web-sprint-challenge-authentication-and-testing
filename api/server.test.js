@@ -24,12 +24,12 @@ describe('[POST] /api/auth/register', () => {
     expect(res.body.message).toBe('username and password required')
   })
   test('register responds if username is taken', async () => {
-    const res = await request(server).post('/api/auth/register').send({username:'user', password:'pass'})
+    const res = await request(server).post('/api/auth/register').send({ username: 'user', password: 'pass' })
     expect(res.status).toBe(401)
     expect(res.body.message).toMatch(/username taken/i)
   })
   test('register responds when registration is valid', async () => {
-    const res = await request(server).post('/api/auth/register').send({username:'foo', password:'bar'})
+    const res = await request(server).post('/api/auth/register').send({ username: 'foo', password: 'bar' })
     expect(res.status).toBe(201)
     expect(res.body).toMatchObject({ id: 2, username: 'foo' })
   })
@@ -71,5 +71,18 @@ describe('[GET] /api/jokes', () => {
         "joke": "Why didn’t the skeleton cross the road? Because he had no guts."
       },
     ])
+  })
+
+  test('jokes responds Onn invalid or expired token in the Authorization header', async () => {
+    let res = await request(server).post('/api/auth/login').send({ username: 'user', password: 'pass' })
+    res = await request(server).get('/api/jokes').set('Authorization', { token: 'invalidtoken' })
+    expect(res.status).toBe(401)
+    expect(res.body.message).toMatch(/token invalid/i)
+  })
+
+  test('jokes responds on missing token in the Authorization header', async () => {
+    const res = await request(server).get('/api/jokes')
+    expect(res.status).toBe(401)
+    expect(res.body.message).toMatch(/token required/i)
   })
 })
