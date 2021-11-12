@@ -1,5 +1,3 @@
-// const { JWT_SECRET } = require("../secrets"); // use this secret!
-// const jwt = require('jsonwebtoken');
 const User = require('../users/users-model');
 
 const validateEmpty = (req, res, next) => {
