@@ -1,14 +1,18 @@
 const User = require('../users/users-model');
 
+function isNotEmptyString(str) {
+    return typeof str === 'string' && str.trim().length > 0
+}
+
 const validateEmpty = (req, res, next) => {
     const { username, password } = req.body;
-    if (!username || !username.trim() || !password || !password.trim()) {
+    if (isNotEmptyString(username) && isNotEmptyString(password)) {
+        next()
+    } else {
         return next(({
             status: 401,
             message: 'username and password required'
         }));
-    } else {
-        next()
     }
 };
 
